@@ -10,10 +10,10 @@ pub fn createLibrary(b: *std.Build, target: std.zig.CrossTarget, optimize: std.b
         .name = "foundation",
         .target = target,
         .optimize = optimize,
-        .root_source_file = .{ .path = "src/libc.zig" },
+        .root_source_file = .{ .path = sdk_root ++ "/src/libc.zig" },
     });
 
-    libc.addIncludePath(.{ .path = "include" });
+    libc.addIncludePath(.{ .path = sdk_root ++ "/include" });
 
     return libc;
 }
