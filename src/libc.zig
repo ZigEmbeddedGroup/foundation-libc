@@ -2,6 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 
 pub const h = @cImport({
+    @cInclude("assert.h");
     @cInclude("ctype.h");
     @cInclude("errno.h");
     @cInclude("inttypes.h");
@@ -10,7 +11,6 @@ pub const h = @cImport({
     @cInclude("stdlib.h");
     @cInclude("string.h");
     @cInclude("tgmath.h");
-    @cInclude("uchar.h");
     @cInclude("uchar.h");
 
     @cInclude("foundation/libc.h");
