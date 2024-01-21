@@ -118,6 +118,7 @@ pub fn build(b: *std.Build) void {
 }
 
 const header_files = [_][]const u8{
+    "assert.h",
     "ctype.h",
     "errno.h",
     "inttypes.h",
