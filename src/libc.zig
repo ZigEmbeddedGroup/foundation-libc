@@ -35,6 +35,7 @@ comptime {
 
 comptime {
     // Drag in all implementations, so they are compiled:
+    _ = @import("modules/assert.zig");
     _ = @import("modules/ctype.zig");
     _ = @import("modules/errno.zig");
     _ = @import("modules/math.zig");
@@ -42,7 +43,6 @@ comptime {
     _ = @import("modules/stdlib.zig");
     _ = @import("modules/string.zig");
     _ = @import("modules/uchar.zig");
-    _ = @import("modules/assert.zig");
 }
 
 /// Invokes safety-checked undefined behaviour, use this to implement
