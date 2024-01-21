@@ -6,7 +6,7 @@ export fn __assert(
     line: c_uint,
 ) noreturn {
     var buf: [256]u8 = undefined;
-    const str = std.fmt.bufPrint(&buf, "assertion failed: '{s}' in file {s} line {}", .{ assertion, file, line }) catch {
+    const str = std.fmt.bufPrint(&buf, "assertion failed: '{?s}' in file {?s} line {}", .{ assertion, file, line }) catch {
         @panic("assertion failed");
     };
 
