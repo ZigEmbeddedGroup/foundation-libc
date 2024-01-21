@@ -11,6 +11,8 @@ pub const h = @cImport({
     @cInclude("string.h");
     @cInclude("tgmath.h");
     @cInclude("uchar.h");
+    @cInclude("uchar.h");
+
     @cInclude("foundation/libc.h");
 });
 
@@ -40,6 +42,7 @@ comptime {
     _ = @import("modules/stdlib.zig");
     _ = @import("modules/string.zig");
     _ = @import("modules/uchar.zig");
+    _ = @import("modules/assert.zig");
 }
 
 /// Invokes safety-checked undefined behaviour, use this to implement
