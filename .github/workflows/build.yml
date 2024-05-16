@@ -26,4 +26,4 @@ jobs:
       - name: Generate and validate packages
         working-directory: test
         run: |
-          zig build -Dsingle-threaded=${{ matrix.single_thread }}
+          zig build -Dsingle_threaded=${{ matrix.single_thread }}
