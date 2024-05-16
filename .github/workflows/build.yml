@@ -21,8 +21,9 @@ jobs:
       - name: Setup Zig
         uses: goto-bus-stop/setup-zig@v2
         with:
-          version: 0.11.0
+          version: 0.12.0
 
       - name: Generate and validate packages
+        working-directory: test
         run: |
           zig build -Dsingle-threaded=${{ matrix.single_thread }}
