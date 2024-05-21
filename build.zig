@@ -28,6 +28,8 @@ pub fn build(b: *std.Build) void {
             header_name,
         );
 
+    libc.installHeadersDirectory(b.path("include/foundation"), "foundation", .{});
+
     b.installArtifact(libc);
 }
 
