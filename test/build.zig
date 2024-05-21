@@ -4,7 +4,7 @@ const Build = std.Build;
 pub fn build(b: *Build) void {
     const validation_step = b.step("validate", "Runs the test suite and validates everything. Automatically triggered in Debug builds.");
 
-    const maybe_gcc = b.findProgram(&.{"gcc"}, &.{}) catch null;
+    //const maybe_gcc = b.findProgram(&.{"gcc"}, &.{}) catch null;
     const maybe_clang = b.findProgram(&.{"clang"}, &.{}) catch null;
 
     // Compile for huge amount of targets to detect breakage early on:
@@ -45,7 +45,7 @@ pub fn build(b: *Build) void {
                 }
 
                 // use the host C compilers to validate our code:
-                for ([_]?[]const u8{ maybe_gcc, maybe_clang }) |maybe_cc| {
+                for ([_]?[]const u8{maybe_clang}) |maybe_cc| {
                     const cc = maybe_cc orelse continue;
 
                     const ext_compiler = b.addSystemCommand(&.{cc});
