@@ -27,7 +27,7 @@ pub fn build(b: *Build) void {
         }
     }
 
-    const syntax_validator_source = b.path("tests/syntactic-validation.c");
+    const syntax_validator_source = b.path("src/syntactic-validation.c");
 
     // use the shipped C compiler to validate our code:
     {
