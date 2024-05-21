@@ -23,84 +23,84 @@ pub fn build(b: *Build) void {
                     .single_threaded = validation_single_threaded,
                 });
                 validation_step.dependOn(&dep.artifact("foundation").step);
+
+                const syntax_validator_source = b.path("src/syntactic-validation.c");
+
+                {
+                    // Check if the syntax of all of our header files is valid:
+                    const syntax_validator = b.addStaticLibrary(.{
+                        .name = "syntax-validator",
+                        .target = b.host,
+                        .optimize = .Debug,
+                    });
+                    syntax_validator.addCSourceFile(.{
+                        .file = syntax_validator_source,
+                        .flags = &common_c_flags,
+                    });
+                    syntax_validator.linkLibrary(dep.artifact("foundation"));
+                    _ = syntax_validator.getEmittedBin();
+
+                    // Just compile, do not install:
+                    validation_step.dependOn(&syntax_validator.step);
+                }
+
+                // use the host C compilers to validate our code:
+                for ([_]?[]const u8{ maybe_gcc, maybe_clang }) |maybe_cc| {
+                    const cc = maybe_cc orelse continue;
+
+                    const ext_compiler = b.addSystemCommand(&.{cc});
+
+                    // just compile every time, we don't have dir caching
+                    // so changes on the headers wouldn't re-trigger this
+                    ext_compiler.has_side_effects = true;
+
+                    ext_compiler.addPrefixedDirectoryArg("-I", b.path("../include"));
+
+                    ext_compiler.addArg("-c"); // compile only
+                    ext_compiler.addArg("-O0"); // no optimization for fast compiles
+                    ext_compiler.addArg("-ffreestanding"); // we require freestanding environment
+                    ext_compiler.addArg("-nostdlib"); // do not try to link anything useful
+
+                    // turn on warnings
+                    ext_compiler.addArg("-Werror");
+                    ext_compiler.addArg("-Wall");
+                    ext_compiler.addArg("-Wextra");
+
+                    ext_compiler.addFileArg(syntax_validator_source);
+
+                    ext_compiler.addArg("-o");
+                    ext_compiler.addArg(b.pathJoin(&.{ b.makeTempPath(), "dummy" })); // we don't really care where this ends up
+
+                    validation_step.dependOn(&ext_compiler.step);
+                }
+
+                // Validate all modes of assertion:
+                for ([_][]const u8{
+                    "FOUNDATION_LIBC_ASSERT_DEFAULT",
+                    "FOUNDATION_LIBC_ASSERT_NOFILE",
+                    "FOUNDATION_LIBC_ASSERT_NOMSG",
+                    "FOUNDATION_LIBC_ASSERT_EXPECTED",
+                }) |assert_mode| {
+                    // Check if the syntax of all of our header files is valid:
+                    const assert_validator = b.addStaticLibrary(.{
+                        .name = "assert-validator",
+                        .target = b.host,
+                        .optimize = .Debug,
+                    });
+                    assert_validator.addCSourceFile(.{
+                        .file = b.path("src/assert-validator.c"),
+                        .flags = &common_c_flags,
+                    });
+                    //assert_validator.addIncludePath(include_path);
+                    _ = assert_validator.getEmittedBin();
+
+                    assert_validator.defineCMacro("FOUNDATION_LIBC_ASSERT", assert_mode);
+
+                    // Just compile, do not install:
+                    validation_step.dependOn(&assert_validator.step);
+                }
             }
         }
-    }
-
-    const syntax_validator_source = b.path("src/syntactic-validation.c");
-
-    // use the shipped C compiler to validate our code:
-    {
-        // Check if the syntax of all of our header files is valid:
-        const syntax_validator = b.addStaticLibrary(.{
-            .name = "syntax-validator",
-            .target = b.host,
-            .optimize = .Debug,
-        });
-        syntax_validator.addCSourceFile(.{
-            .file = syntax_validator_source,
-            .flags = &common_c_flags,
-        });
-        _ = syntax_validator.getEmittedBin();
-
-        // Just compile, do not install:
-        validation_step.dependOn(&syntax_validator.step);
-    }
-
-    // use the host C compilers to validate our code:
-    for ([_]?[]const u8{ maybe_gcc, maybe_clang }) |maybe_cc| {
-        const cc = maybe_cc orelse continue;
-
-        const ext_compiler = b.addSystemCommand(&.{cc});
-
-        // just compile every time, we don't have dir caching
-        // so changes on the headers wouldn't re-trigger this
-        ext_compiler.has_side_effects = true;
-
-        //ext_compiler.addPrefixedDirectoryArg("-I", include_path);
-
-        ext_compiler.addArg("-c"); // compile only
-        ext_compiler.addArg("-O0"); // no optimization for fast compiles
-        ext_compiler.addArg("-ffreestanding"); // we require freestanding environment
-        ext_compiler.addArg("-nostdlib"); // do not try to link anything useful
-
-        // turn on warnings
-        ext_compiler.addArg("-Werror");
-        ext_compiler.addArg("-Wall");
-        ext_compiler.addArg("-Wextra");
-
-        ext_compiler.addFileArg(syntax_validator_source);
-
-        ext_compiler.addArg("-o");
-        ext_compiler.addArg(b.pathJoin(&.{ b.makeTempPath(), "dummy" })); // we don't really care where this ends up
-
-        validation_step.dependOn(&ext_compiler.step);
-    }
-
-    // Validate all modes of assertion:
-    for ([_][]const u8{
-        "FOUNDATION_LIBC_ASSERT_DEFAULT",
-        "FOUNDATION_LIBC_ASSERT_NOFILE",
-        "FOUNDATION_LIBC_ASSERT_NOMSG",
-        "FOUNDATION_LIBC_ASSERT_EXPECTED",
-    }) |assert_mode| {
-        // Check if the syntax of all of our header files is valid:
-        const assert_validator = b.addStaticLibrary(.{
-            .name = "assert-validator",
-            .target = b.host,
-            .optimize = .Debug,
-        });
-        assert_validator.addCSourceFile(.{
-            .file = .{ .path = "tests/assert-validator.c" },
-            .flags = &common_c_flags,
-        });
-        //assert_validator.addIncludePath(include_path);
-        _ = assert_validator.getEmittedBin();
-
-        assert_validator.defineCMacro("FOUNDATION_LIBC_ASSERT", assert_mode);
-
-        // Just compile, do not install:
-        validation_step.dependOn(&assert_validator.step);
     }
 }
 
