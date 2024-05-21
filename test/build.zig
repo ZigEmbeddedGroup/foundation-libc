@@ -22,8 +22,8 @@ pub fn build(b: *Build) void {
                     .optimize = validation_optimize,
                     .single_threaded = validation_single_threaded,
                 });
-                validation_step.dependOn(&dep.artifact("foundation").step);
 
+                const foundation = dep.artifact("foundation");
                 const syntax_validator_source = b.path("src/syntactic-validation.c");
 
                 {
@@ -37,7 +37,7 @@ pub fn build(b: *Build) void {
                         .file = syntax_validator_source,
                         .flags = &common_c_flags,
                     });
-                    syntax_validator.linkLibrary(dep.artifact("foundation"));
+                    syntax_validator.linkLibrary(foundation);
                     _ = syntax_validator.getEmittedBin();
 
                     // Just compile, do not install:
@@ -91,7 +91,7 @@ pub fn build(b: *Build) void {
                         .file = b.path("src/assert-validator.c"),
                         .flags = &common_c_flags,
                     });
-                    //assert_validator.addIncludePath(include_path);
+                    assert_validator.linkLibrary(foundation);
                     _ = assert_validator.getEmittedBin();
 
                     assert_validator.defineCMacro("FOUNDATION_LIBC_ASSERT", assert_mode);
