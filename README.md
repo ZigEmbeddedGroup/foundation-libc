@@ -1,6 +1,9 @@
 # Foundation libc
 
+This repo has been archived and moved to: https://github.com/ZigEmbeddedGroup/microzig/tree/main/modules/foundation-libc
+
 [![Continuous Integration](https://github.com/ZigEmbeddedGroup/foundation-libc/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/ZigEmbeddedGroup/foundation-libc/actions/workflows/build.yml)
+
 
 A C standard library that only implements a subset of functions that can be safely used without an operating system.
 This is called a [freestanding environment](https://en.cppreference.com/w/cpp/freestanding).
